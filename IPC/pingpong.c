@@ -1,6 +1,3 @@
-//
-// Created by asandler on 5/29/20.
-//
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -20,7 +17,6 @@ void son_handler(int signum){
 			printf("Child is going to be terminated\n");
 			exit(0);
 		}
-
 		//printf("child sending %d to parent\n", number);
 		write(fd[1], &number, sizeof(int));
 		kill(getppid(),SIGUSR1);
@@ -61,14 +57,9 @@ int main() {
 			}
 		}
 	}
-
 	else { //child
 		while (1){
 			signal(SIGUSR1, son_handler);
 		}
 	}
-	close(fd[0]);
-	close(fd[1]);
 }
-
-
