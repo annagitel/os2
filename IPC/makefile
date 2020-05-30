@@ -1,4 +1,4 @@
 all: pp
 
-pp: justpipe.c
-	gcc -o p justpipe.c
+pp: pingpong.c
+	gcc -o pingpong pingpong.c

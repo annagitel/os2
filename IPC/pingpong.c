@@ -1,57 +1,74 @@
+//
+// Created by asandler on 5/29/20.
+//
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <time.h>
 #include <signal.h>
+#include <sys/wait.h>
+int fd[2], number;
+pid_t pid;
 
-int sighandler(int signum) {
-    if (signum == SIGUSR1)
-        return 1;
-    return 0;
+void son_handler(int signum){
+	if (signum == SIGUSR1){
+		read(fd[0], &number, sizeof(int));
+		printf("%d\n",number);
+		//printf("child got %d from parent\n", number);
+		number = number + 1;
+		if (number == 6){
+			printf("Child is going to be terminated\n");
+			exit(0);
+		}
+
+		//printf("child sending %d to parent\n", number);
+		write(fd[1], &number, sizeof(int));
+		kill(getppid(),SIGUSR1);
+	}
 }
-int main ()
-{
-    int  p2c[2], c2p[2], number;
-    pipe(p2c);    //parent to child pipe
-    pipe(c2p);    //child to parent pipe
-    number = 0;
 
-    pid_t father = getpid();
-    printf("father pid: %d\n", father);
-    pid_t child = fork();
-    printf("child pid: %d\n", child);
-
-    if (child == 0 )
-    { //child process
-        while(number < 6)
-        {
-            printf("in child process ");
-            if(signal(SIGINT, sighandler) == 1)
-                read(p2c[0], &number, sizeof(int));
-            printf("%d\n", number);
-            number = number + 1;
-            write(c2p[1], &number, sizeof(int));
-            kill(father,SIGUSR1);
-        }
-        close(p2c[0]); close(p2c[1]);
-        close(c2p[0]); close(c2p[1]);
-        exit(0);
-    }
-    else { //parent process
-        while(number < 6)
-        {
-            printf("in parent process ");
-            if(signal(SIGINT, sighandler) == 1)
-                read(c2p[0], &number, sizeof(int));
-            printf("%d\n", number);
-            number = number + 1;
-            write(p2c[1], &number, sizeof(int));
-            kill(child,SIGUSR1);
-        }
-        close(p2c[0]); close(p2c[1]);
-        close(c2p[0]); close(c2p[1]);
-    }
-    printf("Child is going to be terminated\n");
-    printf("Parent is going to be terminated\n");
+void father_handler(int signum){
+	if (signum == SIGUSR1){
+		read(fd[0], &number, sizeof(int));
+		printf("%d\n",number);
+		//printf("parent got  %d from child\n", number);
+		number = number + 1;
+		//printf("parent sending %d to child\n", number);
+		write(fd[1], &number, sizeof(int));
+		kill(pid,SIGUSR1);
+	}
 }
+
+int main() {
+	number = 0;
+	pipe(fd);
+	pid = fork();
+
+	if(!pid) { //first child sends
+		//printf("child sending %d to parent\n", number);
+		write(fd[1], &number, sizeof(int));
+		kill(getppid(), SIGUSR1);
+	}
+
+	if (pid) { //parent
+		while (1) {
+			signal(SIGUSR1, father_handler);
+			if(wait(NULL)) {
+				printf("Parent is going to be terminated\n");
+				close(fd[0]);
+				close(fd[1]);
+				exit(0);
+			}
+		}
+	}
+
+	else { //child
+		while (1){
+			signal(SIGUSR1, son_handler);
+		}
+	}
+	close(fd[0]);
+	close(fd[1]);
+}
+
 
