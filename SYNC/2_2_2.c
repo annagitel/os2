@@ -21,21 +21,22 @@ void test(int phnum)
 	if (state[phnum] == HUNGRY 
 		&& state[LEFT] != EATING 
 		&& state[RIGHT] != EATING) { 
-		// state that eating 
-		state[phnum] = EATING; 
-
+		// state that eating
+		int subnum = (phnum+2)%5;
+		state[phnum] = EATING;
+		state[subnum] = EATING;
 		sleep(2); 
 
 		printf("Philosopher %d takes fork %d and %d\n", 
-					phnum + 1, LEFT + 1, phnum + 1); 
+					phnum + 1, LEFT + 1, phnum + 1);
+		printf("Philosopher %d takes fork %d and %d\n",
+			   subnum + 1, (LEFT+2)%5 + 1, subnum + 1);
 
-		printf("Philosopher %d is Eating\n", phnum + 1); 
+		printf("Philosopher %d is Eating\n", phnum + 1);
+		printf("Philosopher %d is Eating\n", subnum + 1);
 
-		// sem_post(&S[phnum]) has no effect 
-		// during takefork 
-		// used to wake up hungry philosophers 
-		// during putfork 
-		sem_post(&S[phnum]); 
+		sem_post(&S[phnum]);
+		sem_post(&S[subnum]);
 	} 
 } 
 

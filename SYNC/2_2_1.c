@@ -18,9 +18,7 @@ sem_t S[N];
 
 void test(int phnum) 
 { 
-	if (state[phnum] == HUNGRY 
-		&& state[LEFT] != EATING 
-		&& state[RIGHT] != EATING) { 
+	if (phnum%2==1) {
 		// state that eating 
 		state[phnum] = EATING; 
 
