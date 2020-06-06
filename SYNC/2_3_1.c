@@ -18,24 +18,12 @@ sem_t S[N];
 
 void test(int phnum) 
 { 
-	if (state[phnum] == HUNGRY 
-		&& state[LEFT] != EATING 
-		&& state[RIGHT] != EATING) { 
+	if (state[phnum] == HUNGRY) {
 		// state that eating 
-		state[phnum] = EATING; 
+		//state[phnum] = EATING;
 
-		sleep(2); 
-
-		printf("Philosopher %d takes fork %d and %d\n", 
-					phnum + 1, LEFT + 1, phnum + 1); 
-
-		printf("Philosopher %d is Eating\n", phnum + 1); 
-
-		// sem_post(&S[phnum]) has no effect 
-		// during takefork 
-		// used to wake up hungry philosophers 
-		// during putfork 
-		sem_post(&S[phnum]); 
+		sleep(2);
+		sem_post(&S[phnum]);
 	} 
 } 
 
@@ -70,8 +58,6 @@ void put_fork(int phnum)
 	// state that thinking 
 	state[phnum] = THINKING; 
 
-	printf("Philosopher %d putting fork %d and %d down\n", 
-		phnum + 1, LEFT + 1, phnum + 1); 
 	printf("Philosopher %d is thinking\n", phnum + 1); 
 
 	test(LEFT); 
