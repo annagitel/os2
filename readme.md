@@ -7,15 +7,15 @@ The first one to write to the pipe is the son, after writing he sends a SIGUSR1 
 he reads from the pipe, increses he number by 1 , writes the new number to the pipe and sends a SIGUSR1 to the son process
 and so on untill the number in 5, then the son process is terminated and after him the father process is terminated
 to run type make in the terminal and then ./pingpong
-the expected output is:
-0
-1
-2
-3
-4
-5
-Child is going to be terminated
-Parent is going to be terminated
+the expected output is:  
+0  
+1  
+2  
+3  
+4  
+5  
+Child is going to be terminated  
+Parent is going to be terminated  
 
 SYNC:
 in this part I was asked to demonstrate 3 cases and their solutions, for each one of them there is a code:
